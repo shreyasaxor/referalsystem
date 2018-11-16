@@ -25,7 +25,7 @@ SECRET_KEY = 'ow)nhfe69n#-7p08cbhu21resu0p)po4m8isfgs836&$*ej()5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'usermgmt.User'
 

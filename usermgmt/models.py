@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models
-
 # Create your models here.
 
 from django.db import models
+from django.db.models import Sum
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
@@ -54,6 +53,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+    """this tables consist information about user"""
+
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -107,10 +108,15 @@ class User(AbstractBaseUser):
         "Is the user active?"
         return self.active
 
+    def get_rewards(self):
+        "to get user rewards"
+        wallet = Wallet.objects.filter(user=self).aggregate(earned=Sum('credits'))
+        return wallet['earned'] if wallet['earned'] is not None else 0;
 
 class Wallet(models.Model):
+    """this tables consist information about rewards"""
 
     user = models.ForeignKey(User,null=True,related_name="users")
-    refered = models.ForeignKey(User,null=True,related_name="refered_users")
-    refered_by = models.ForeignKey(User,null=True,related_name="refered_by_users")
-    credits =  models.IntegerField()
+    refered_to= models.ForeignKey(User,null=True,related_name="refered_users")
+    credits =  models.IntegerField(default=1, blank=True, null=True)
+
