@@ -35,7 +35,7 @@ Request body
 
 -----------------------------------------------------
 
-To save user with referalcode
+To save user with referal code
 
 `POST:http://127.0.0.1:8000/usermgmt/api/121212323`   
 
@@ -50,7 +50,7 @@ Request body
 
 ---------------------------------------------------------
 
-To authenticate user and get referal,total-earned
+To authenticate user and get referal-url,total-earned
 
 `POST:http://127.0.0.1:8000/usermgmt/api/121212323`   
 
