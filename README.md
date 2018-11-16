@@ -10,7 +10,7 @@ this application is built to signup users  and refer others to earn
 `$ pip install -r requirements.txt  `   
 `$ cd projectname/`      
 `$ python manage.py makemigrations`   
-`$ python manage.py migrate` 
+`$ python manage.py migrate`   
 `$ python manage.py runserver`
 
 **API Detail**
