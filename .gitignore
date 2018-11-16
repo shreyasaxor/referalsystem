@@ -3,7 +3,7 @@
 __pycache__/
 *.py[cod]
 migrations/
-idea/
+.idea/
 .env
 db.sqlite3-journal
 db.sqlite3

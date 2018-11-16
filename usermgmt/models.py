@@ -65,10 +65,6 @@ class User(AbstractBaseUser):
     staff = models.BooleanField(default=False) # a admin user; non super-user
     admin = models.BooleanField(default=False) # a superuser
     referal_code = models.CharField(max_length=250,null=True)
-
-    # is_bonus = models.BooleanField(default=False) # a superuser
-    # refered_by = models.ForeignKey('self',null=True)
-
     # notice the absence of a "Password field", that's built in.
 
     USERNAME_FIELD = 'email'
@@ -116,4 +112,5 @@ class Wallet(models.Model):
 
     user = models.ForeignKey(User,null=True,related_name="users")
     refered = models.ForeignKey(User,null=True,related_name="refered_users")
+    refered_by = models.ForeignKey(User,null=True,related_name="refered_by_users")
     credits =  models.IntegerField()

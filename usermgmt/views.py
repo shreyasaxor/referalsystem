@@ -1,13 +1,17 @@
 # Create your views here.
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+from django.db.models import Sum
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .utils import generate_secretkey,authenticate_key,get_referalurl
-from .serializers import UserSerializers
+from django.contrib.auth import authenticate, login ,logout
+
+from .utils import authenticate_key,get_referalurl
+from .serializers import UserSerializers,LoginSerializer
 from .models import User,Wallet
-from .exceptions import IncorrectData
+from .exceptions import IncorrectData,IncorrectAuthCredentials
 
 class GetUser(APIView):
 
@@ -25,22 +29,21 @@ class GetUser(APIView):
             if refered_user:
                 serializer = UserSerializers(data=request.data)
                 if serializer.is_valid(raise_exception=True):
-                    serializer.save(referal_code=generate_secretkey())
-                    Wallet.objects.create(user_id=serializer.data['id'],refered_id=refered_user.id,credits=100)
+                    serializer.save()
                     Wallet.objects.create(user_id=refered_user.id,refered_id=serializer.data['id'],credits=100)
-                    referal_url = get_referalurl(request, serializer.data)
-                    return Response({'data': referal_url,"is_rewardwed":True}, status=status.HTTP_200_OK)
+                    Wallet.objects.create(user_id=serializer.data['id'],refered_by_id=refered_user.id,credits=100)
+                    referal_url = get_referalurl(request, serializer.data['referal_code'])
+                    return Response({'data': referal_url,"is_rewarded":True}, status=status.HTTP_200_OK)
                 else:
                     raise IncorrectData(detail=serializer.errors, code=400)
             else:
-                print "last falsee"
-                return Response({'data': "fake referance id"}, status=status.HTTP_200_OK)
+                raise IncorrectData(detail="fake user id", code=400)
 
         else:
             serializer = UserSerializers(data=request.data)
             if  serializer.is_valid(raise_exception=True):
-                serializer.save(referal_code=generate_secretkey())
-                referal_url = get_referalurl(request,serializer.data)
+                serializer.save()
+                referal_url = get_referalurl(request,serializer.data['referal_code'])
                 return Response({'data':referal_url}, status=status.HTTP_200_OK)
             else:
                 raise IncorrectData(detail=serializer.errors, code=400)
@@ -53,9 +56,17 @@ class LoginUser(APIView):
 
 
     def post(self,request,*args,**kwargs):
-        print request.data['email']
-        print request.data['password']
-        return Response({'data': request.data}, status=status.HTTP_200_OK)
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = authenticate(request, email=(request.data['email']), password=request.data['password'])
+        else:
+            raise IncorrectData(detail="Incorrect ,Wrong data format ",code=400)
+        if not user:
+            raise IncorrectAuthCredentials(detail="Incorrect authentication credentials",code=401)
+        login(request, user)
+        url = get_referalurl(request,user.referal_code)
+        total_earned = user.users.aggregate(earned=Sum('credits'))
+        return Response({'total_earned':total_earned['earned'],"url":url}, status=status.HTTP_200_OK)
 
 
 login_user = LoginUser.as_view()

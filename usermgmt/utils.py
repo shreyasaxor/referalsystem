@@ -2,7 +2,7 @@ import random
 from .models import User
 
 def get_referalurl(request,data):
-    return  str(request.get_host())+str(request.get_full_path())+str(data['referal_code'])
+    return  str(request.get_host())+'/usermgmt/api/'+str(data)
 
 
 def generate_secretkey():
