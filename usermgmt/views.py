@@ -64,7 +64,7 @@ class LoginUser(APIView):
         if serializer.is_valid(raise_exception=True):
             user = authenticate(request, email=(request.data['email']), password=request.data['password'])
         else:
-            raise IncorrectData(detail="Incorrect,Wrong data format ",code=400)
+            raise IncorrectData(detail=serializer.errors,code=400)
         if not user:
             raise IncorrectAuthCredentials(detail="Incorrect authentication credentials",code=401)
         url = get_referalurl(request,user.referal_code)
